@@ -1,68 +1,76 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Earth } from "@/assets/model/Earth";
-
-interface PinProps {
-  lat: number;
-  lon: number;
-  radius: number;
-  onClick: () => void;
-}
-function Pin({ lat, lon, radius, onClick }: PinProps) {
-  const toRadians = (deg: number) => (deg * Math.PI) / 180;
-
-  // แปลงค่าพิกัดให้ตรงกับพื้นผิวทรงกลม
-  const theta = toRadians(lon);
-  const phi = toRadians(lat);
-  const x = radius * Math.cos(theta) * Math.cos(phi);
-  const y = radius * Math.sin(phi);
-  const z = radius * Math.sin(theta) * Math.cos(phi);
-
-  return (
-    <mesh position={[x, y, z]} onClick={onClick}>
-      <sphereGeometry args={[0.2, 16, 16]} />
-      <meshStandardMaterial color="red" emissive="red" emissiveIntensity={2} />
-    </mesh>
-  );
-}
+import { EarthModel } from "@/assets/model/Earth";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { responsiveCallback } from "@/utils/responsive";
 export default function App() {
-  const [info, setInfo] = useState("Click a pin to see details");
+  const router = useRouter();
+  const [isClicked, setIsClicked] = useState<boolean>(false);
+  const [changePageColor, setChangePageColor] = useState<string>(
+    "oklch(0.623 0.214 259.815)"
+  );
+  const [earthScale, setEarthScale] = useState<number>(1.5);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const updateScale = () => {
+      responsiveCallback({
+        ssm: () => setEarthScale(1),
+        sm: () => setEarthScale(1.2),
+        md: () => setEarthScale(1.4),
+        lg: () => setEarthScale(1.6),
+        xl: () => setEarthScale(1.8),
+        xxl: () => setEarthScale(2),
+      });
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
+
+  const handleClick = (event: React.MouseEvent) => {
+    setMousePos({ x: event.clientX, y: event.clientY });
+    setIsClicked(true);
+    setTimeout(() => {
+      router.push("/home");
+    }, 2000);
+  };
 
   return (
-    <div className="h-screen w-full flex flex-col items-center justify-center bg-gray-900 text-white">
+    <div className="relative h-screen bg-gray-900 text-white flex flex-col items-center justify-center overflow-hidden">
       <Canvas camera={{ position: [0, 2, 5] }}>
-        <OrbitControls />
-        <ambientLight intensity={0.5} />
+        <OrbitControls enableZoom={false} />
+        <ambientLight intensity={1} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
-
-        {/* 🌍 Earth Model */}
-        <Earth scale={2} />
-
-        {/* 📍 Pins on Earth */}
-        <Pin
-          lat={30}
-          lon={10}
-          radius={2}
-          onClick={() => setInfo("About Me: I'm a Full-Stack Dev!")}
-        />
-        <Pin
-          lat={-25}
-          lon={-60}
-          radius={2}
-          onClick={() => setInfo("Skills: React, Next.js, R3F")}
-        />
-        <Pin
-          lat={50}
-          lon={120}
-          radius={2}
-          onClick={() => setInfo("Projects: NatureX Admin, ERP App")}
+        <EarthModel
+          scale={earthScale}
+          onClick={handleClick}
+          setChangePageColor={setChangePageColor}
         />
       </Canvas>
-
-      {/* ℹ️ Info Display */}
-      <div className="mt-4 p-4 bg-gray-800 rounded-lg shadow-lg">{info}</div>
+      {isClicked && (
+        <motion.div
+          className="absolute rounded-full transform -translate-1/2"
+          initial={{
+            width: "0",
+            height: "0",
+            top: mousePos.y,
+            left: mousePos.x,
+          }}
+          animate={{
+            width: "200vw",
+            height: "200vw",
+            top: mousePos.y,
+            left: mousePos.x,
+          }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          style={{ backgroundColor: changePageColor }}
+        />
+      )}
     </div>
   );
 }
