@@ -1,26 +1,31 @@
 "use client";
 import React from "react";
-import { useBackgroundColor } from "../store/zustand";
 import { ComputerModel } from "@/assets/model/Computer";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Text from "@/Components/Text";
+import Section from "@/Components/Section";
+import Flex from "@/Components/Flex";
 
 const Home = () => {
-  const { backgroundColor } = useBackgroundColor();
   return (
-    <div
-      style={{ backgroundColor: backgroundColor }}
-      className=" min-h-screen w-screen flex items-center justify-center flex-col text-white"
+    <Flex
+      direction="col"
+      className="overflow-x-hidden min-h-screen w-screen text-white bg-green-500"
     >
-      <div className="h-screen w-screen flex flex-col items-center justify-center">
-        <Text h1 center color="#F87171">
-          สวัสดี
-        </Text>
-        <div className="w-full h-auto flex items-center justify-center">
+      <Section>
+        <Flex className="w-full h-full flex-1" align="end">
+          <Text h1 center size="64px">
+            สวัสดีครับ ผมโอ๊กนะครับ
+          </Text>
+        </Flex>
+        <Flex className="w-full h-auto flex-2">
           <Canvas
             camera={{ position: [0, 0, 1], fov: 50 }}
-            style={{ width: "100%", height: "auto" }}
+            style={{
+              width: "100%",
+              height: "400px",
+            }}
           >
             <OrbitControls
               enableZoom={false}
@@ -29,11 +34,14 @@ const Home = () => {
             />
             <ambientLight intensity={1} />
             <directionalLight position={[5, 5, 5]} intensity={1} />
-            <ComputerModel scale={1} position={[0, -0.5, 0]} />
+            <ComputerModel scale={1} position={[0, -0.3, 0]} />
           </Canvas>
-        </div>
-      </div>
-    </div>
+        </Flex>
+      </Section>
+      <Section>
+        <div>text</div>
+      </Section>
+    </Flex>
   );
 };
 

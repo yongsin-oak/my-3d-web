@@ -6,6 +6,7 @@ import { EarthModel } from "@/assets/model/Earth";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { responsiveCallback } from "@/utils/responsive";
+import Flex from "@/Components/Flex";
 export default function App() {
   const router = useRouter();
   const [isClicked, setIsClicked] = useState<boolean>(false);
@@ -41,7 +42,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative h-screen bg-gray-900 text-white flex flex-col items-center justify-center overflow-hidden">
+    <Flex className="relative h-screen bg-gray-900 text-white overflow-hidden">
       <Canvas camera={{ position: [0, 2, 5] }}>
         <OrbitControls enableZoom={false} />
         <ambientLight intensity={1} />
@@ -71,6 +72,6 @@ export default function App() {
           style={{ backgroundColor: changePageColor }}
         />
       )}
-    </div>
+    </Flex>
   );
 }

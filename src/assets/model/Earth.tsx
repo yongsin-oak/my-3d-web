@@ -3,8 +3,7 @@ import React, { useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import { useFrame } from "@react-three/fiber";
-import { useBackgroundColor } from "@/app/store/zustand";
- 
+
 type GLTFResult = GLTF & {
   nodes: {
     ["URF-Height_watr_0"]: THREE.Mesh;
@@ -27,7 +26,6 @@ export function EarthModel(props: EarthProps) {
     "/earthModel/scene.gltf"
   ) as unknown as GLTFResult;
   const earthRef = useRef<THREE.Group>(null);
-  const { setBackgroundColor } = useBackgroundColor();
   useFrame(() => {
     if (earthRef.current) {
       earthRef.current.rotation.y += 0.002;
@@ -64,7 +62,6 @@ export function EarthModel(props: EarthProps) {
           onClick={() => {
             const color = getMaterialColor(materials.Lampd);
             props.setChangePageColor(color);
-            setBackgroundColor(color);
           }}
         />
         <mesh

@@ -11,16 +11,36 @@ type TextProps = {
   s1?: boolean;
   s2?: boolean;
   s3?: boolean;
+  size?: string;
   medium?: boolean;
   semiBold?: boolean;
   bold?: boolean;
   center?: boolean;
-  error?: boolean;
   color?: string;
   children: React.ReactNode;
-};
+} & React.HTMLAttributes<HTMLSpanElement>;
 
-const Text: React.FC<TextProps> = ({ children, error, color, ...props }) => {
+const allowedProps = [
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "s1",
+  "s2",
+  "s3",
+  "medium",
+  "semiBold",
+  "bold",
+  "center",
+];
+
+const Text: React.FC<TextProps> = ({ children, size, className, style, ...props }) => {
+  const domProps = Object.fromEntries(
+    Object.entries(props).filter(([key]) => !allowedProps.includes(key))
+  );
+
   return (
     <span
       className={cn(
@@ -36,12 +56,15 @@ const Text: React.FC<TextProps> = ({ children, error, color, ...props }) => {
         props.medium && "font-medium",
         props.semiBold && "font-semibold",
         props.bold && "font-bold",
-        props.center && "text-center"
+        props.center && "text-center",
+        className
       )}
       style={{
-        color: error ? "#F87171" : color,
-        fontFamily: "var(--font-mitr)",
+        color: props.color,
+        fontSize: size,
+        ...style,
       }}
+      {...domProps}
     >
       {children}
     </span>
